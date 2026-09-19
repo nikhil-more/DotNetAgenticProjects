@@ -58,7 +58,11 @@ public class AgentChatClient
             {
                 streamingHandler.Invoke(update.Text);
             }
+
+            ExtractTokenUsageFromStreamingUpdate(update);
         }
+
+        _tokenTracker.LogUsageDetails();
     }
 
     public async IAsyncEnumerable<string> GetStreamingResponseAsync(string userQuery, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -69,6 +73,21 @@ public class AgentChatClient
             {
                 yield return update.Text;
             }
+
+            ExtractTokenUsageFromStreamingUpdate(update);
         }
+
+        _tokenTracker.LogUsageDetails();
+    }
+
+    private void ExtractTokenUsageFromStreamingUpdate(AgentResponseUpdate update)
+    {
+        if (update.Contents == null)    return;
+
+        var usageContent = update.Contents.OfType<UsageContent>().FirstOrDefault();
+
+        if (usageContent?.Details == null)   return;
+
+        _tokenTracker.UpdateUsageDetails(usageContent.Details);
     }
 }

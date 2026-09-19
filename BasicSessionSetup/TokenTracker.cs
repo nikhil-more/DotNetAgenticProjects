@@ -35,7 +35,7 @@ public class TokenTracker
 
     public void LogUsageDetails()
     {
-        Console.WriteLine("=================================================");
+        Console.WriteLine("\n=================================================");
         Console.WriteLine($"Current Token Usage By '{_agentName}' : ");
         Console.WriteLine($"Input Token Count : {_inputTokenCount}");
         Console.WriteLine($"Output Token Count : {_outputTokenCount}");

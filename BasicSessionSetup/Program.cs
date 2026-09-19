@@ -13,16 +13,16 @@ while (true)
         break;
     }
 
-    var response = await agentChat.GetResponseAsync(userQuery, printTokenUsage: true);
+    // var response = await agentChat.GetResponseAsync(userQuery, printTokenUsage: true);
 
-    Console.WriteLine($"Assistant : {response}");
+    // Console.WriteLine($"Assistant : {response}");
 
     // await agentChat.GetStreamingResponseAsync(userQuery, (string chunk) => Console.Write(chunk));
     // Console.WriteLine();
 
-    // await foreach (var chunk in agentChat.GetStreamingResponseAsync(userQuery))
-    // {
-    //     Console.Write(chunk);
-    // }
-    // Console.WriteLine();
+    await foreach (var chunk in agentChat.GetStreamingResponseAsync(userQuery))
+    {
+        Console.Write(chunk);
+    }
+    Console.WriteLine();
 }
