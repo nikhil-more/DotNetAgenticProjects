@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
@@ -29,6 +30,17 @@ public class AgentChatClient
         await foreach (var update in chatClient.GetStreamingResponseAsync(userQuery))
         {
             streamingHandler.Invoke(update.Text);
+        }
+    }
+
+    public async IAsyncEnumerable<string> GetStreamingResponseAsync(string userQuery, [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    {
+        await foreach(var update in chatClient.GetStreamingResponseAsync(userQuery, cancellationToken: cancellationToken))
+        {
+            if (!string.IsNullOrWhiteSpace(update.Text))
+            {
+                yield return update.Text;
+            }
         }
     }
 }

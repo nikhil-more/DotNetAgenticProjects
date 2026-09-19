@@ -17,6 +17,12 @@ while (true)
 
     // Console.WriteLine($"Assistant : {response}");
 
-    await agentChat.GetStreamingResponseAsync(userQuery, (string chunk) => Console.Write(chunk));
+    // await agentChat.GetStreamingResponseAsync(userQuery, (string chunk) => Console.Write(chunk));
+    // Console.WriteLine();
+
+    await foreach (var chunk in agentChat.GetStreamingResponseAsync(userQuery))
+    {
+        Console.Write(chunk);
+    }
     Console.WriteLine();
 }
