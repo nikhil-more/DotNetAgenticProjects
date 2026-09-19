@@ -1,21 +1,43 @@
 using System.Runtime.CompilerServices;
+using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
 public class AgentChatClient
 {
-    private readonly IChatClient chatClient;
-    private readonly string codeName;
+    private readonly AIAgent _chatAgent;
+    private AgentSession? _agentSession = null;
+    private readonly string _codeName;
 
-    public AgentChatClient(OpenAIClient openAIClient, string modelName, string codeName)
+    private AgentChatClient(OpenAIClient openAIClient, string modelName, string codeName)
     {
-        chatClient = openAIClient.GetChatClient(modelName).AsIChatClient();
-        this.codeName = codeName;
+        this._chatAgent = openAIClient.GetChatClient(modelName).AsIChatClient().AsAIAgent(
+            name: codeName,
+            description: "Basic Chat Assistant",
+            instructions: "Answer user queries with available information. Avoid verbose responses unless asked"
+        );
+        this._codeName = codeName;
+    }
+
+    public static async Task<AgentChatClient> CreateAgentChatClientInstance(OpenAIClient openAIClient, string modelName, string codeName)
+    {
+        var agentClient = new AgentChatClient(openAIClient, modelName, codeName);
+        agentClient._agentSession = await agentClient._chatAgent.CreateSessionAsync();
+
+        return agentClient;
+    }
+
+    private async Task InitializeAgentSession(bool forceNew = false)
+    {
+        if (forceNew || _agentSession == null)
+        {
+            _agentSession = await _chatAgent.CreateSessionAsync();
+        }
     }
 
     public async Task<string> GetResponseAsync(string userQuery, bool printTokenUsage = false)
     {
-        var response = await chatClient.GetResponseAsync(userQuery);
+        var response = await _chatAgent.RunAsync(userQuery, session: _agentSession);
 
         if (printTokenUsage && response.Usage != null)
         {
@@ -27,7 +49,7 @@ public class AgentChatClient
 
     public async Task GetStreamingResponseAsync(string userQuery, Action<string> streamingHandler)
     {
-        await foreach (var update in chatClient.GetStreamingResponseAsync(userQuery))
+        await foreach (var update in _chatAgent.RunStreamingAsync(userQuery, session: _agentSession))
         {
             streamingHandler.Invoke(update.Text);
         }
@@ -35,7 +57,7 @@ public class AgentChatClient
 
     public async IAsyncEnumerable<string> GetStreamingResponseAsync(string userQuery, [EnumeratorCancellation]CancellationToken cancellationToken = default)
     {
-        await foreach(var update in chatClient.GetStreamingResponseAsync(userQuery, cancellationToken: cancellationToken))
+        await foreach(var update in _chatAgent.RunStreamingAsync(userQuery, session: _agentSession, cancellationToken: cancellationToken))
         {
             if (!string.IsNullOrWhiteSpace(update.Text))
             {
@@ -43,6 +65,5 @@ public class AgentChatClient
             }
         }
     }
-}
 
-//Great. So lets say person A is standing behind person B. Person C is standing ahead of Person A. There are 3 people between Person C and Person E. There are in total 5 people - A, B, C, D, E. So tell me where is D standing and how many people are there in between B and D. (By ahead it means directly in front of it, with no one in between)
+}

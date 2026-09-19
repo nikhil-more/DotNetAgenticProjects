@@ -1,5 +1,5 @@
 ﻿AgentProvider agentProvider = new AgentProvider();
-AgentChatClient agentChat = agentProvider.GetAgentChatClient("BasicSetup");
+AgentChatClient agentChat = await agentProvider.GetAgentChatClient("BasicSetup");
 
 Console.WriteLine("You can start asking your queryies");
 

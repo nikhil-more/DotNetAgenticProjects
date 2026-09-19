@@ -52,9 +52,10 @@ public class AgentProvider
         return openAIClient;
     }
 
-    public AgentChatClient GetAgentChatClient(string codeName)
+    public async Task<AgentChatClient> GetAgentChatClient(string codeName)
     {
-        var agentChatClient = new AgentChatClient(openAIClient, lightweightModel, codeName);
+
+        var agentChatClient = await AgentChatClient.CreateAgentChatClientInstance(openAIClient, lightweightModel, codeName);
 
         Console.WriteLine($"Agent Chat Client Initialized Sucessfully. (CodeName : {codeName})");
 
