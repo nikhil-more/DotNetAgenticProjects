@@ -13,7 +13,10 @@ while (true)
         break;
     }
 
-    var response = await agentChat.GetResponseAsync(userQuery);
+    // var response = await agentChat.GetResponseAsync(userQuery, printTokenUsage: true);
 
-    Console.WriteLine($"Assistant : {response}");
+    // Console.WriteLine($"Assistant : {response}");
+
+    await agentChat.GetStreamingResponseAsync(userQuery, (string chunk) => Console.Write(chunk));
+    Console.WriteLine();
 }

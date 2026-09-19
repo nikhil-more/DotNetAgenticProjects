@@ -1,5 +1,4 @@
 using System.ClientModel;
-using Microsoft.Extensions.AI;
 using OpenAI;
 
 public class AgentProvider
