@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="BasicSessionSetup/BasicSessionSetup.csproj" />
   <Project Path="BasicSetup/BasicSetup.csproj" />
+  <Project Path="PersistentSessionSetup/PersistentSessionSetup.csproj" />
 </Solution>
